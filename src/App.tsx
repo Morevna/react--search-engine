@@ -1,88 +1,162 @@
 import { Component } from 'react';
+import Search from './components/Search';
+import Results from './components/Results';
+import TestErrorButton from './components/TestErrorButton';
 
-interface Entity {
+export interface Pokemon {
   name: string;
-  url: string;
+  description: string;
+  image: string;
 }
 
 interface State {
   searchTerm: string;
-  results: Entity[];
+  results: Pokemon[];
   isLoading: boolean;
+  error: string | null;
 }
 
 class App extends Component<object, State> {
   constructor(props: object) {
     super(props);
+
     this.state = {
       searchTerm: localStorage.getItem('savedSearch') || '',
       results: [],
       isLoading: false,
+      error: null,
     };
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     this.fetchData();
   }
 
-  fetchData = async () => {
-    this.setState({ isLoading: true });
-    const { searchTerm } = this.state;
+  fetchData = async (): Promise<void> => {
+    this.setState({
+      isLoading: true,
+      error: null,
+    });
+
+    const trimmed = this.state.searchTerm.trim();
 
     try {
-      const url = searchTerm
-        ? `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase().trim()}`
-        : 'https://pokeapi.co/api/v2/pokemon?limit=10';
+      const url = trimmed
+        ? `https://pokeapi.co/api/v2/pokemon/${trimmed.toLowerCase()}`
+        : `https://pokeapi.co/api/v2/pokemon?limit=10`;
 
       const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Pokemon not found');
+      }
+
       const data = await response.json();
 
-      const results = data.results
-        ? data.results
-        : [{ name: data.name, url: '' }];
-      this.setState({ results, isLoading: false });
-    } catch (error) {
-      console.error(error);
-      this.setState({ results: [], isLoading: false });
+      if (data.results) {
+        const detailed = await Promise.all(
+          data.results.map(async (pokemon: { name: string; url: string }) => {
+            const res = await fetch(pokemon.url);
+            const pokemonData = await res.json();
+
+            return {
+              name: pokemonData.name,
+              description: `Base experience: ${pokemonData.base_experience}`,
+              image: pokemonData.sprites.front_default,
+            };
+          })
+        );
+
+        this.setState({
+          results: detailed,
+          isLoading: false,
+        });
+      } else {
+        this.setState({
+          results: [
+            {
+              name: data.name,
+              description: `Base experience: ${data.base_experience}`,
+              image: data.sprites.front_default,
+            },
+          ],
+          isLoading: false,
+        });
+      }
+    } catch {
+      this.setState({
+        error: 'Failed to load data. Please try again.',
+        results: [],
+        isLoading: false,
+      });
     }
   };
 
-  handleSearch = () => {
+  handleInputChange = (value: string): void => {
+    this.setState({
+      searchTerm: value,
+    });
+  };
+
+  handleSearch = (): void => {
     const trimmed = this.state.searchTerm.trim();
-    if (trimmed !== localStorage.getItem('savedSearch')) {
-      localStorage.setItem('savedSearch', trimmed);
-      this.fetchData();
+    const saved = localStorage.getItem('savedSearch');
+
+    if (trimmed === saved) {
+      return;
     }
+
+    localStorage.setItem('savedSearch', trimmed);
+
+    this.setState(
+      {
+        searchTerm: trimmed,
+      },
+      this.fetchData
+    );
   };
 
   render() {
+    const { searchTerm, results, isLoading, error } = this.state;
+
     return (
-      <div style={{ padding: '20px' }}>
+      <div
+        style={{
+          padding: '20px',
+          maxWidth: '900px',
+          margin: '0 auto',
+        }}
+      >
         <section
-          style={{ borderBottom: '1px solid #ccc', paddingBottom: '20px' }}
+          style={{
+            padding: '20px',
+            border: '1px solid #ccc',
+            borderRadius: '10px',
+            marginBottom: '20px',
+            background: '#f5f5f5',
+          }}
         >
-          <input
-            type="text"
-            value={this.state.searchTerm}
-            onChange={(e) => this.setState({ searchTerm: e.target.value })}
-            placeholder="Например: pikachu"
+          <Search
+            value={searchTerm}
+            onChange={this.handleInputChange}
+            onSearch={this.handleSearch}
           />
-          <button onClick={this.handleSearch}>Search</button>
         </section>
 
-        <section style={{ marginTop: '20px' }}>
-          {this.state.isLoading ? (
-            <p>Loading...</p>
-          ) : (
-            <ul>
-              {this.state.results.map((item, index) => (
-                <li key={index}>
-                  <strong>{item.name}</strong>
-                  <p>URL: {item.url || 'Detail view'}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+        <section
+          style={{
+            minHeight: '400px',
+            padding: '20px',
+            border: '1px solid #ccc',
+            borderRadius: '10px',
+          }}
+        >
+          <Results
+            results={results}
+            isLoading={isLoading}
+            error={error}
+          />
+          <TestErrorButton />
         </section>
       </div>
     );
