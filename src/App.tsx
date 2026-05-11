@@ -151,11 +151,7 @@ class App extends Component<object, State> {
             borderRadius: '10px',
           }}
         >
-          <Results
-            results={results}
-            isLoading={isLoading}
-            error={error}
-          />
+          <Results results={results} isLoading={isLoading} error={error} />
           <TestErrorButton />
         </section>
       </div>
