@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Outlet, Link, useSearchParams } from 'react-router-dom';
 import Search from '../components/Search';
 import Results from '../components/Results';
 import TestErrorButton from '../components/TestErrorButton';
@@ -10,33 +11,37 @@ const Main = () => {
   const [results, setResults] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  const fetchData = useCallback(async (term: string) => {
+  const fetchData = useCallback(async (term: string, page: number) => {
     setIsLoading(true);
     setError(null);
     const trimmed = term.trim();
+    const limit = 10;
+    const offset = (page - 1) * limit;
 
     try {
       const url = trimmed
         ? `https://pokeapi.co/api/v2/pokemon/${trimmed.toLowerCase()}`
-        : `https://pokeapi.co/api/v2/pokemon?limit=10`;
+        : `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
 
       const response = await fetch(url);
-      if (!response.ok) throw new Error('Pokemon not found');
+      if (!response.ok) throw new Error('Not found');
       const data = await response.json();
 
       if (data.results) {
         const detailed = await Promise.all(
           data.results.map(async (p: { name: string; url: string }) => {
             const res = await fetch(p.url);
-            const pd = await res.json();
-            return {
-              name: pd.name,
-              description: `Base experience: ${pd.base_experience}`,
-              image: pd.sprites.front_default,
-            };
+            return await res.json();
           })
-        );
+        ).then(res => res.map(pd => ({
+          name: pd.name,
+          description: `Base experience: ${pd.base_experience}`,
+          image: pd.sprites.front_default,
+        })));
         setResults(detailed);
       } else {
         setResults([{
@@ -53,30 +58,58 @@ const Main = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const loadData = async () => {
-      await fetchData(searchTerm);
+useEffect(() => {
+    const load = async () => {
+      await fetchData(searchTerm, currentPage);
     };
     
-    loadData();
-  }, [fetchData, searchTerm]);
+    load();
+  }, [fetchData, searchTerm, currentPage]);
 
   const handleSearch = () => {
-    const trimmed = searchTerm.trim();
-    if (trimmed === localStorage.getItem('savedSearch')) return;
-    fetchData(trimmed);
+    const saved = localStorage.getItem('savedSearch') || '';
+
+    if (searchTerm.trim() === saved.trim() && results.length > 0) return;
+    
+    setSearchParams({ page: '1' });
+
   };
 
   return (
-    <>
-      <section style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '10px', marginBottom: '20px', background: '#f5f5f5' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <section style={{ padding: '20px', background: '#f5f5f5', borderRadius: '10px' }}>
         <Search value={searchTerm} onChange={setSearchTerm} onSearch={handleSearch} />
       </section>
-      <section style={{ minHeight: '400px', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
-        <Results results={results} isLoading={isLoading} error={error} />
-        <TestErrorButton />
-      </section>
-    </>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <section style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            {results.length > 0 && !isLoading && !error ? (
+              results.map((p) => (
+                <Link key={p.name} to={`/details/${p.name.toLowerCase()}?page=${currentPage}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div style={{ padding: '10px', border: '1px solid #eee', marginBottom: '8px', borderRadius: '5px' }}>
+                    <strong style={{ textTransform: 'capitalize' }}>{p.name}</strong>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <Results results={results} isLoading={isLoading} error={error} />
+            )}
+          </div>
+          
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <button disabled={currentPage <= 1} onClick={() => setSearchParams({ page: (currentPage - 1).toString() })}>Prev</button>
+            <span>Page {currentPage}</span>
+            <button onClick={() => setSearchParams({ page: (currentPage + 1).toString() })}>Next</button>
+          </div>
+          <TestErrorButton />
+        </section>
+
+        <section style={{ border: '1px solid #ccc', borderRadius: '10px', background: '#fafafa' }}>
+          <Outlet />
+        </section>
+      </div>
+    </div>
   );
 };
 

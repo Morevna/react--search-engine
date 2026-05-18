@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../../App';
@@ -33,19 +33,23 @@ describe('App Integration', () => {
   });
 
   it('performs search and updates localStorage', async () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/']}>
+          <App />
+        </MemoryRouter>
+      );
+    });
     
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
 
     const input = screen.getByPlaceholderText(/search pokemon/i);
     const button = screen.getByRole('button', { name: /search/i });
 
-    fireEvent.change(input, { target: { value: 'pikachu' } });
-    fireEvent.click(button);
+    await act(async () => {
+      fireEvent.change(input, { target: { value: 'pikachu' } });
+      fireEvent.click(button);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('pikachu')).toBeInTheDocument();
@@ -54,16 +58,15 @@ describe('App Integration', () => {
     expect(localStorage.getItem('savedSearch')).toBe('pikachu');
   });
 
-  it('does not trigger a new fetch if search term is the same as saved', async () => {
+it('does not trigger a new fetch if search term is the same as saved', async () => {
     localStorage.setItem('savedSearch', 'pikachu');
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={['/?page=1']}>
         <App />
       </MemoryRouter>
     );
 
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
-    
     (globalThis.fetch as Mock).mockClear();
 
     const button = screen.getByRole('button', { name: /search/i });
@@ -75,11 +78,13 @@ describe('App Integration', () => {
   it('handles API error gracefully', async () => {
     (globalThis.fetch as Mock).mockResolvedValueOnce({ ok: false });
 
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/']}>
+          <App />
+        </MemoryRouter>
+      );
+    });
 
     await waitFor(() => {
       expect(
