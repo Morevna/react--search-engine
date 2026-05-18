@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import App from '../../App';
 
 const mockPokemonList = {
@@ -32,13 +33,18 @@ describe('App Integration', () => {
   });
 
   it('performs search and updates localStorage', async () => {
-    render(<App />);
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+    
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
 
     const input = screen.getByPlaceholderText(/search pokemon/i);
     const button = screen.getByRole('button', { name: /search/i });
 
     fireEvent.change(input, { target: { value: 'pikachu' } });
-
     fireEvent.click(button);
 
     await waitFor(() => {
@@ -50,19 +56,30 @@ describe('App Integration', () => {
 
   it('does not trigger a new fetch if search term is the same as saved', async () => {
     localStorage.setItem('savedSearch', 'pikachu');
-    render(<App />);
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
+    
+    (globalThis.fetch as Mock).mockClear();
 
     const button = screen.getByRole('button', { name: /search/i });
-
     fireEvent.click(button);
 
-    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(0);
   });
 
   it('handles API error gracefully', async () => {
     (globalThis.fetch as Mock).mockResolvedValueOnce({ ok: false });
 
-    render(<App />);
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       expect(
