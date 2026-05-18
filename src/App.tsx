@@ -1,7 +1,8 @@
+import { useState, useEffect, useCallback } from 'react';
 import Search from './components/Search';
 import Results from './components/Results';
 import TestErrorButton from './components/TestErrorButton';
-import { useState, useEffect, useCallback } from 'react';
+import { useLocalStorage } from './hooks/useLocalStorage';
 
 export interface Pokemon {
   name: string;
@@ -10,9 +11,8 @@ export interface Pokemon {
 }
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem('savedSearch') || ''
-  );
+  const [searchTerm, setSearchTerm] = useLocalStorage('savedSearch', '');
+
   const [results, setResults] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,14 +66,10 @@ const App = () => {
   useEffect(() => {
     let isMounted = true;
 
-    const initFetch = async () => {
-      if (isMounted) {
-        await fetchData(searchTerm);
-      }
-    };
-
-    initFetch();
-
+    if (isMounted) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchData(searchTerm);
+    }
     return () => {
       isMounted = false;
     };
@@ -84,9 +80,7 @@ const App = () => {
   };
 
   const handleSearch = () => {
-    const trimmed = searchTerm.trim();
-    localStorage.setItem('savedSearch', trimmed);
-    fetchData(trimmed);
+    fetchData(searchTerm);
   };
 
   return (
