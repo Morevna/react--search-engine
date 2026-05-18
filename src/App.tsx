@@ -1,7 +1,7 @@
-import { Component } from 'react';
 import Search from './components/Search';
 import Results from './components/Results';
 import TestErrorButton from './components/TestErrorButton';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface Pokemon {
   name: string;
@@ -9,36 +9,19 @@ export interface Pokemon {
   image: string;
 }
 
-interface State {
-  searchTerm: string;
-  results: Pokemon[];
-  isLoading: boolean;
-  error: string | null;
-}
+const App = () => {
+  const [searchTerm, setSearchTerm] = useState(
+    localStorage.getItem('savedSearch') || ''
+  );
+  const [results, setResults] = useState<Pokemon[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-class App extends Component<object, State> {
-  constructor(props: object) {
-    super(props);
+  const fetchData = useCallback(async (term: string) => {
+    setIsLoading(true);
+    setError(null);
 
-    this.state = {
-      searchTerm: localStorage.getItem('savedSearch') || '',
-      results: [],
-      isLoading: false,
-      error: null,
-    };
-  }
-
-  componentDidMount(): void {
-    this.fetchData();
-  }
-
-  fetchData = async (): Promise<void> => {
-    this.setState({
-      isLoading: true,
-      error: null,
-    });
-
-    const trimmed = this.state.searchTerm.trim();
+    const trimmed = term.trim();
 
     try {
       const url = trimmed
@@ -46,10 +29,7 @@ class App extends Component<object, State> {
         : `https://pokeapi.co/api/v2/pokemon?limit=10`;
 
       const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error('Pokemon not found');
-      }
+      if (!response.ok) throw new Error('Pokemon not found');
 
       const data = await response.json();
 
@@ -58,7 +38,6 @@ class App extends Component<object, State> {
           data.results.map(async (pokemon: { name: string; url: string }) => {
             const res = await fetch(pokemon.url);
             const pokemonData = await res.json();
-
             return {
               name: pokemonData.name,
               description: `Base experience: ${pokemonData.base_experience}`,
@@ -66,97 +45,81 @@ class App extends Component<object, State> {
             };
           })
         );
-
-        this.setState({
-          results: detailed,
-          isLoading: false,
-        });
+        setResults(detailed);
       } else {
-        this.setState({
-          results: [
-            {
-              name: data.name,
-              description: `Base experience: ${data.base_experience}`,
-              image: data.sprites.front_default,
-            },
-          ],
-          isLoading: false,
-        });
+        setResults([
+          {
+            name: data.name,
+            description: `Base experience: ${data.base_experience}`,
+            image: data.sprites.front_default,
+          },
+        ]);
       }
     } catch {
-      this.setState({
-        error: 'Failed to load data. Please try again.',
-        results: [],
-        isLoading: false,
-      });
+      setError('Failed to load data. Please try again.');
+      setResults([]);
+    } finally {
+      setIsLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const initFetch = async () => {
+      if (isMounted) {
+        await fetchData(searchTerm);
+      }
+    };
+
+    initFetch();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchData, searchTerm]);
+
+  const handleInputChange = (value: string) => {
+    setSearchTerm(value);
   };
 
-  handleInputChange = (value: string): void => {
-    this.setState({
-      searchTerm: value,
-    });
-  };
-
-  handleSearch = (): void => {
-    const trimmed = this.state.searchTerm.trim();
-    const saved = localStorage.getItem('savedSearch');
-
-    if (trimmed === saved) {
-      return;
-    }
-
+  const handleSearch = () => {
+    const trimmed = searchTerm.trim();
     localStorage.setItem('savedSearch', trimmed);
-
-    this.setState(
-      {
-        searchTerm: trimmed,
-      },
-      this.fetchData
-    );
+    fetchData(trimmed);
   };
 
-  render() {
-    const { searchTerm, results, isLoading, error } = this.state;
-
-    return (
-      <div
+  return (
+    <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
+      <section
         style={{
           padding: '20px',
-          maxWidth: '900px',
-          margin: '0 auto',
+          border: '1px solid #ccc',
+          borderRadius: '10px',
+          marginBottom: '20px',
+          background: '#f5f5f5',
         }}
       >
-        <section
-          style={{
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '10px',
-            marginBottom: '20px',
-            background: '#f5f5f5',
-          }}
-        >
-          <Search
-            value={searchTerm}
-            onChange={this.handleInputChange}
-            onSearch={this.handleSearch}
-          />
-        </section>
+        <Search
+          value={searchTerm}
+          onChange={handleInputChange}
+          onSearch={handleSearch}
+        />
+      </section>
 
-        <section
-          style={{
-            minHeight: '400px',
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '10px',
-          }}
-        >
-          <Results results={results} isLoading={isLoading} error={error} />
-          <TestErrorButton />
-        </section>
-      </div>
-    );
-  }
-}
+      <section
+        style={{
+          minHeight: '400px',
+          padding: '20px',
+          border: '1px solid #ccc',
+          borderRadius: '10px',
+        }}
+      >
+        <Results results={results} isLoading={isLoading} error={error} />
+        <TestErrorButton />
+      </section>
+    </div>
+  );
+};
 
 export default App;
