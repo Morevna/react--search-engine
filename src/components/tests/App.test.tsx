@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../../App';
@@ -40,7 +46,7 @@ describe('App Integration', () => {
         </MemoryRouter>
       );
     });
-    
+
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
 
     const input = screen.getByPlaceholderText(/search pokemon/i);
@@ -58,7 +64,7 @@ describe('App Integration', () => {
     expect(localStorage.getItem('savedSearch')).toBe('pikachu');
   });
 
-it('does not trigger a new fetch if search term is the same as saved', async () => {
+  it('does not trigger a new fetch if search term is the same as saved', async () => {
     localStorage.setItem('savedSearch', 'pikachu');
     render(
       <MemoryRouter initialEntries={['/?page=1']}>

@@ -40,22 +40,32 @@ const PokemonDetail = () => {
   if (!details) return null;
 
   return (
-    <div style={{ padding: '20px', borderLeft: '2px solid #ccc', position: 'relative' }}>
-      <button 
-        onClick={() => navigate('/')} 
+    <div
+      style={{
+        padding: '20px',
+        borderLeft: '2px solid #ccc',
+        position: 'relative',
+      }}
+    >
+      <button
+        onClick={() => navigate('/')}
         style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer' }}
         aria-label="Close"
       >
         ✖
       </button>
       <h2 style={{ textTransform: 'capitalize' }}>{details.name}</h2>
-      <img 
-        src={details.sprites.front_default} 
-        alt={details.name} 
-        style={{ width: '150px' }} 
+      <img
+        src={details.sprites.front_default}
+        alt={details.name}
+        style={{ width: '150px' }}
       />
-      <p><strong>Weight:</strong> {details.weight}</p>
-      <p><strong>Height:</strong> {details.height}</p>
+      <p>
+        <strong>Weight:</strong> {details.weight}
+      </p>
+      <p>
+        <strong>Height:</strong> {details.height}
+      </p>
     </div>
   );
 };

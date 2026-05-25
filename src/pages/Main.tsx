@@ -5,13 +5,14 @@ import Results from '../components/Results';
 import TestErrorButton from '../components/TestErrorButton';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Pokemon } from '../App';
+import PokemonCard from '../components/PokemonCard';
 
 const Main = () => {
   const [searchTerm, setSearchTerm] = useLocalStorage('savedSearch', '');
   const [results, setResults] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
@@ -37,18 +38,22 @@ const Main = () => {
             const res = await fetch(p.url);
             return await res.json();
           })
-        ).then(res => res.map(pd => ({
-          name: pd.name,
-          description: `Base experience: ${pd.base_experience}`,
-          image: pd.sprites.front_default,
-        })));
+        ).then((res) =>
+          res.map((pd) => ({
+            name: pd.name,
+            description: `Base experience: ${pd.base_experience}`,
+            image: pd.sprites.front_default,
+          }))
+        );
         setResults(detailed);
       } else {
-        setResults([{
-          name: data.name,
-          description: `Base experience: ${data.base_experience}`,
-          image: data.sprites.front_default,
-        }]);
+        setResults([
+          {
+            name: data.name,
+            description: `Base experience: ${data.base_experience}`,
+            image: data.sprites.front_default,
+          },
+        ]);
       }
     } catch {
       setError('Failed to load data. Please try again.');
@@ -58,11 +63,11 @@ const Main = () => {
     }
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
     const load = async () => {
       await fetchData(searchTerm, currentPage);
     };
-    
+
     load();
   }, [fetchData, searchTerm, currentPage]);
 
@@ -70,42 +75,81 @@ useEffect(() => {
     const saved = localStorage.getItem('savedSearch') || '';
 
     if (searchTerm.trim() === saved.trim() && results.length > 0) return;
-    
-    setSearchParams({ page: '1' });
 
+    setSearchParams({ page: '1' });
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <section style={{ padding: '20px', background: '#f5f5f5', borderRadius: '10px' }}>
-        <Search value={searchTerm} onChange={setSearchTerm} onSearch={handleSearch} />
+      <section
+        style={{ padding: '20px', background: '#f5f5f5', borderRadius: '10px' }}
+      >
+        <Search
+          value={searchTerm}
+          onChange={setSearchTerm}
+          onSearch={handleSearch}
+        />
       </section>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        <section style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}
+      >
+        <section
+          style={{
+            padding: '20px',
+            border: '1px solid #ccc',
+            borderRadius: '10px',
+          }}
+        >
           <div style={{ marginBottom: '20px' }}>
             {results.length > 0 && !isLoading && !error ? (
               results.map((p) => (
-                <Link key={p.name} to={`/details/${p.name.toLowerCase()}?page=${currentPage}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ padding: '10px', border: '1px solid #eee', marginBottom: '8px', borderRadius: '5px' }}>
-                    <strong style={{ textTransform: 'capitalize' }}>{p.name}</strong>
-                  </div>
+                <Link
+                  key={p.name}
+                  to={`/details/${p.name.toLowerCase()}?page=${currentPage}`}
+                  style={{
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    display: 'block',
+                    marginBottom: '10px',
+                  }}
+                >
+                  <PokemonCard pokemon={p} onClick={() => {}} />
                 </Link>
               ))
             ) : (
               <Results results={results} isLoading={isLoading} error={error} />
             )}
           </div>
-          
+
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button disabled={currentPage <= 1} onClick={() => setSearchParams({ page: (currentPage - 1).toString() })}>Prev</button>
+            <button
+              disabled={currentPage <= 1}
+              onClick={() =>
+                setSearchParams({ page: (currentPage - 1).toString() })
+              }
+            >
+              Prev
+            </button>
             <span>Page {currentPage}</span>
-            <button onClick={() => setSearchParams({ page: (currentPage + 1).toString() })}>Next</button>
+            <button
+              onClick={() =>
+                setSearchParams({ page: (currentPage + 1).toString() })
+              }
+            >
+              Next
+            </button>
           </div>
           <TestErrorButton />
         </section>
 
-        <section style={{ border: '1px solid #ccc', borderRadius: '10px', background: '#fafafa' }}>
+        <section
+          style={{
+            border: '1px solid #ccc',
+            borderRadius: '10px',
+            background: '#fafafa',
+          }}
+        >
           <Outlet />
         </section>
       </div>
