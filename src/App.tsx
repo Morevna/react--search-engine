@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import AppRouter from './AppRouter';
 import Flyout from './components/Flyout';
+import { useContext } from 'react';
+import { ThemeContext } from './context/ThemeContext';
 
 export interface Pokemon {
   name: string;
@@ -9,6 +11,7 @@ export interface Pokemon {
 }
 
 const App = () => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   return (
     <div
       style={{
@@ -18,6 +21,10 @@ const App = () => {
         paddingBottom: '80px',
       }}
     >
+      <button onClick={toggleTheme} style={{ float: 'right' }}>
+        {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+      </button>
+
       <header>
         <nav style={{ marginBottom: '20px', display: 'flex', gap: '20px' }}>
           <Link to="/">Main</Link>

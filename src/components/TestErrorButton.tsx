@@ -16,8 +16,8 @@ const TestErrorButton = ({}) => {
       onClick={handleClick}
       style={{
         position: 'fixed',
-        right: '20px',
-        bottom: '20px',
+        left: '20px',
+        bottom: '10px',
         padding: '12px 16px',
         border: 'none',
         borderRadius: '8px',

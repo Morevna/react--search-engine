@@ -27,7 +27,6 @@ const PokemonCard = ({ pokemon, onClick }: Props) => {
         type="checkbox"
         checked={isChecked}
         onChange={(e) => {
-          e.preventDefault();
           e.stopPropagation();
           toggle(pokemon);
         }}
@@ -36,7 +35,7 @@ const PokemonCard = ({ pokemon, onClick }: Props) => {
           position: 'absolute',
           top: '10px',
           left: '10px',
-          zIndex: 10,
+          zIndex: 100,
           cursor: 'pointer',
         }}
       />
