@@ -1,56 +1,20 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
-interface PokemonData {
-  name: string;
-  weight: number;
-  height: number;
-  sprites: {
-    front_default: string;
-  };
-}
+import { usePokemonDetails } from '../hooks/usePokemonQueries';
 
 const PokemonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [details, setDetails] = useState<PokemonData | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!id) return;
+  const { data: details, isLoading } = usePokemonDetails(id);
 
-    const loadPokemonDetails = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-        if (!res.ok) throw new Error();
-        const data: PokemonData = await res.json();
-        setDetails(data);
-      } catch (error) {
-        console.error('Failed to fetch details', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPokemonDetails();
-  }, [id]);
-
-  if (loading) return <div>Loading details...</div>;
+  if (isLoading) return <div>Loading details...</div>;
   if (!details) return null;
 
   return (
-    <div
-      style={{
-        padding: '20px',
-        borderLeft: '2px solid #ccc',
-        position: 'relative',
-      }}
-    >
+    <div style={{ padding: '20px', position: 'relative' }}>
       <button
         onClick={() => navigate('/')}
         style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer' }}
-        aria-label="Close"
       >
         ✖
       </button>
