@@ -8,6 +8,7 @@ import {
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../../App';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockPokemonList = {
   results: [{ name: 'pikachu', url: 'https://pokeapi.co/api/v2/pokemon/25/' }],
@@ -20,9 +21,20 @@ const mockSinglePokemon = {
 };
 
 describe('App Integration', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          staleTime: Infinity,
+        },
+      },
+    });
 
     globalThis.fetch = vi.fn((url: string) => {
       if (url.includes('limit=10')) {
@@ -41,9 +53,11 @@ describe('App Integration', () => {
   it('performs search and updates localStorage', async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={['/']}>
-          <App />
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={['/']}>
+            <App />
+          </MemoryRouter>
+        </QueryClientProvider>
       );
     });
 
@@ -66,19 +80,27 @@ describe('App Integration', () => {
 
   it('does not trigger a new fetch if search term is the same as saved', async () => {
     localStorage.setItem('savedSearch', 'pikachu');
-    render(
-      <MemoryRouter initialEntries={['/?page=1']}>
-        <App />
-      </MemoryRouter>
-    );
+
+    await act(async () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={['/?page=1']}>
+            <App />
+          </MemoryRouter>
+        </QueryClientProvider>
+      );
+    });
 
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalled());
-    (globalThis.fetch as Mock).mockClear();
+    const initialCallCount = (globalThis.fetch as Mock).mock.calls.length;
 
     const button = screen.getByRole('button', { name: /search/i });
-    fireEvent.click(button);
 
-    expect(globalThis.fetch).toHaveBeenCalledTimes(0);
+    await act(async () => {
+      fireEvent.click(button);
+    });
+
+    expect((globalThis.fetch as Mock).mock.calls.length).toBe(initialCallCount);
   });
 
   it('handles API error gracefully', async () => {
@@ -86,16 +108,16 @@ describe('App Integration', () => {
 
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={['/']}>
-          <App />
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <MemoryRouter initialEntries={['/']}>
+            <App />
+          </MemoryRouter>
+        </QueryClientProvider>
       );
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/failed to load data. please try again./i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/pokemon not found/i)).toBeInTheDocument();
     });
   });
 });

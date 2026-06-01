@@ -2,8 +2,18 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import PokemonDetail from '../PokemonDetail';
 import { expect, test, vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
 
 test('renders pokemon details', async () => {
+  const queryClient = createTestQueryClient();
+
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
@@ -18,11 +28,13 @@ test('renders pokemon details', async () => {
   );
 
   render(
-    <MemoryRouter initialEntries={['/details/pikachu']}>
-      <Routes>
-        <Route path="/details/:id" element={<PokemonDetail />} />
-      </Routes>
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/details/pikachu']}>
+        <Routes>
+          <Route path="/details/:id" element={<PokemonDetail />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
 
   await waitFor(() => {
