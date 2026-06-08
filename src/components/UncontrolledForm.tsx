@@ -59,7 +59,10 @@ const UncontrolledForm = ({ onSuccess }: Props) => {
     }
 
     addSubmission(result.data);
-    e.currentTarget.reset();
+    const formElement = e.currentTarget;
+    if (formElement) {
+      formElement.reset();
+    }
     onSuccess();
   };
 

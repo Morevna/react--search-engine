@@ -25,25 +25,25 @@ const HookForm = ({ onSuccess }: Props) => {
     reset,
   } = useForm({
     resolver: zodResolver(formSchema),
-    mode: 'onChange', 
+    mode: 'onChange',
     defaultValues: {
       name: '',
-      age: '' as unknown as number, 
+      age: '' as unknown as number,
       email: '',
       gender: '' as 'male' | 'female' | 'other',
       country: '',
       password: '',
       confirmPassword: '',
       image: '',
-      terms: false as unknown as true, 
+      terms: false as unknown as true,
     },
   });
 
-const watchedPassword = useWatch({
-  control,
-  name: 'password',
-  defaultValue: '',
-});
+  const watchedPassword = useWatch({
+    control,
+    name: 'password',
+    defaultValue: '',
+  });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -68,50 +68,83 @@ const watchedPassword = useWatch({
   };
 
   const renderError = (fieldName: keyof FormSchemaType) => (
-    <div style={{ color: 'red', fontSize: '0.8rem', minHeight: '18px', marginTop: '2px' }}>
+    <div
+      style={{
+        color: 'red',
+        fontSize: '0.8rem',
+        minHeight: '18px',
+        marginTop: '2px',
+      }}
+    >
       {errors[fieldName]?.message || ''}
     </div>
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+    >
       <div>
-        <label htmlFor="hk-name" style={{ fontWeight: 'bold', display: 'block' }}>Name:</label>
-        <input 
-          id="hk-name" 
-          type="text" 
-          {...register('name')} 
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} 
+        <label
+          htmlFor="hk-name"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Name:
+        </label>
+        <input
+          id="hk-name"
+          type="text"
+          {...register('name')}
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
         {renderError('name')}
       </div>
 
       <div>
-        <label htmlFor="hk-age" style={{ fontWeight: 'bold', display: 'block' }}>Age:</label>
-        <input 
-          id="hk-age" 
-          type="number" 
-          {...register('age', { valueAsNumber: true })} 
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} 
+        <label
+          htmlFor="hk-age"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Age:
+        </label>
+        <input
+          id="hk-age"
+          type="number"
+          {...register('age', { valueAsNumber: true })}
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
         {renderError('age')}
       </div>
 
       <div>
-        <label htmlFor="hk-email" style={{ fontWeight: 'bold', display: 'block' }}>Email:</label>
-        <input 
-          id="hk-email" 
-          type="text" 
-          {...register('email')} 
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} 
+        <label
+          htmlFor="hk-email"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Email:
+        </label>
+        <input
+          id="hk-email"
+          type="text"
+          {...register('email')}
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
         {renderError('email')}
       </div>
 
       <div>
-        <label htmlFor="hk-gender" style={{ fontWeight: 'bold', display: 'block' }}>Gender:</label>
-        <select id="hk-gender" {...register('gender')} style={{ width: '100%', padding: '8px' }}>
+        <label
+          htmlFor="hk-gender"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Gender:
+        </label>
+        <select
+          id="hk-gender"
+          {...register('gender')}
+          style={{ width: '100%', padding: '8px' }}
+        >
           <option value="">-- Select Gender --</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -121,7 +154,12 @@ const watchedPassword = useWatch({
       </div>
 
       <div>
-        <label htmlFor="hk-country" style={{ fontWeight: 'bold', display: 'block' }}>Country:</label>
+        <label
+          htmlFor="hk-country"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Country:
+        </label>
         <input
           id="hk-country"
           type="text"
@@ -130,40 +168,55 @@ const watchedPassword = useWatch({
           placeholder="Type to search country..."
           style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
-        <CountryAutocomplete id="hk-country" name="country" /> 
+        <CountryAutocomplete id="hk-country" name="country" />
         {renderError('country')}
       </div>
 
       <div>
-        <label htmlFor="hk-password" style={{ fontWeight: 'bold', display: 'block' }}>Password:</label>
-        <input 
-          id="hk-password" 
-          type="password" 
-          {...register('password')} 
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} 
+        <label
+          htmlFor="hk-password"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Password:
+        </label>
+        <input
+          id="hk-password"
+          type="password"
+          {...register('password')}
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
         <PasswordStrength password={watchedPassword} />
         {renderError('password')}
       </div>
 
       <div>
-        <label htmlFor="hk-confirmPassword" style={{ fontWeight: 'bold', display: 'block' }}>Confirm Password:</label>
-        <input 
-          id="hk-confirmPassword" 
-          type="password" 
-          {...register('confirmPassword')} 
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} 
+        <label
+          htmlFor="hk-confirmPassword"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Confirm Password:
+        </label>
+        <input
+          id="hk-confirmPassword"
+          type="password"
+          {...register('confirmPassword')}
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
         {renderError('confirmPassword')}
       </div>
 
       <div>
-        <label htmlFor="hk-image" style={{ fontWeight: 'bold', display: 'block' }}>Profile Image:</label>
-        <input 
-          id="hk-image" 
-          type="file" 
-          accept="image/png, image/jpeg" 
-          onChange={handleImageChange} 
+        <label
+          htmlFor="hk-image"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Profile Image:
+        </label>
+        <input
+          id="hk-image"
+          type="file"
+          accept="image/png, image/jpeg"
+          onChange={handleImageChange}
         />
         <input type="hidden" {...register('image')} />
         {renderError('image')}
@@ -177,16 +230,16 @@ const watchedPassword = useWatch({
         {renderError('terms')}
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         disabled={!isValid}
-        style={{ 
-          padding: '10px', 
-          marginTop: '16px', 
-          cursor: isValid ? 'pointer' : 'not-allowed', 
-          fontSize: '1rem', 
+        style={{
+          padding: '10px',
+          marginTop: '16px',
+          cursor: isValid ? 'pointer' : 'not-allowed',
+          fontSize: '1rem',
           fontWeight: 'bold',
-          opacity: isValid ? 1 : 0.5
+          opacity: isValid ? 1 : 0.5,
         }}
       >
         Submit (Hook Form)
