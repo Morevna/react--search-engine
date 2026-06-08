@@ -11,7 +11,7 @@ interface Props {
 
 const UncontrolledForm = ({ onSuccess }: Props) => {
   const addSubmission = useFormStore((state) => state.addSubmission);
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentPassword, setCurrentPassword] = useState('');
 
@@ -20,7 +20,7 @@ const UncontrolledForm = ({ onSuccess }: Props) => {
     setErrors({});
 
     const formData = new FormData(e.currentTarget);
-    
+
     const imageFile = formData.get('imageFile') as File;
     let base64Image = '';
 
@@ -55,44 +55,92 @@ const UncontrolledForm = ({ onSuccess }: Props) => {
         }
       });
       setErrors(fieldErrors);
-      return; 
+      return;
     }
 
     addSubmission(result.data);
     e.currentTarget.reset();
-    onSuccess(); 
+    onSuccess();
   };
 
   const renderError = (field: string) => (
-    <div style={{ color: 'red', fontSize: '0.8rem', minHeight: '18px', marginTop: '2px' }}>
+    <div
+      style={{
+        color: 'red',
+        fontSize: '0.8rem',
+        minHeight: '18px',
+        marginTop: '2px',
+      }}
+    >
       {errors[field] || ''}
     </div>
   );
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+    >
       <div>
-        <label htmlFor="unc-name" style={{ fontWeight: 'bold', display: 'block' }}>Name:</label>
-        <input id="unc-name" name="name" type="text" style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+        <label
+          htmlFor="unc-name"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Name:
+        </label>
+        <input
+          id="unc-name"
+          name="name"
+          type="text"
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+        />
         {renderError('name')}
       </div>
 
       <div>
-        <label htmlFor="unc-age" style={{ fontWeight: 'bold', display: 'block' }}>Age:</label>
-        <input id="unc-age" name="age" type="number" style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+        <label
+          htmlFor="unc-age"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Age:
+        </label>
+        <input
+          id="unc-age"
+          name="age"
+          type="number"
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+        />
         {renderError('age')}
       </div>
 
       <div>
-        <label htmlFor="unc-email" style={{ fontWeight: 'bold', display: 'block' }}>Email:</label>
-        <input id="unc-email" name="email" type="text" style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+        <label
+          htmlFor="unc-email"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Email:
+        </label>
+        <input
+          id="unc-email"
+          name="email"
+          type="text"
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+        />
         {renderError('email')}
       </div>
 
       <div>
-        <label htmlFor="unc-gender" style={{ fontWeight: 'bold', display: 'block' }}>Gender:</label>
-        <select id="unc-gender" name="gender" style={{ width: '100%', padding: '8px' }}>
+        <label
+          htmlFor="unc-gender"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Gender:
+        </label>
+        <select
+          id="unc-gender"
+          name="gender"
+          style={{ width: '100%', padding: '8px' }}
+        >
           <option value="">-- Select Gender --</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -102,33 +150,63 @@ const UncontrolledForm = ({ onSuccess }: Props) => {
       </div>
 
       <div>
-        <label htmlFor="unc-country" style={{ fontWeight: 'bold', display: 'block' }}>Country:</label>
+        <label
+          htmlFor="unc-country"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Country:
+        </label>
         <CountryAutocomplete id="unc-country" name="country" />
         {renderError('country')}
       </div>
 
       <div>
-        <label htmlFor="unc-password" style={{ fontWeight: 'bold', display: 'block' }}>Password:</label>
-        <input 
-          id="unc-password" 
-          name="password" 
-          type="password" 
+        <label
+          htmlFor="unc-password"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Password:
+        </label>
+        <input
+          id="unc-password"
+          name="password"
+          type="password"
           onChange={(e) => setCurrentPassword(e.target.value)}
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} 
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
         />
         <PasswordStrength password={currentPassword} />
         {renderError('password')}
       </div>
 
       <div>
-        <label htmlFor="unc-confirmPassword" style={{ fontWeight: 'bold', display: 'block' }}>Confirm Password:</label>
-        <input id="unc-confirmPassword" name="confirmPassword" type="password" style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+        <label
+          htmlFor="unc-confirmPassword"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Confirm Password:
+        </label>
+        <input
+          id="unc-confirmPassword"
+          name="confirmPassword"
+          type="password"
+          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+        />
         {renderError('confirmPassword')}
       </div>
 
       <div>
-        <label htmlFor="unc-image" style={{ fontWeight: 'bold', display: 'block' }}>Profile Image:</label>
-        <input id="unc-image" name="imageFile" type="file" accept="image/png, image/jpeg" />
+        <label
+          htmlFor="unc-image"
+          style={{ fontWeight: 'bold', display: 'block' }}
+        >
+          Profile Image:
+        </label>
+        <input
+          id="unc-image"
+          name="imageFile"
+          type="file"
+          accept="image/png, image/jpeg"
+        />
         {renderError('image')}
       </div>
 
@@ -140,7 +218,16 @@ const UncontrolledForm = ({ onSuccess }: Props) => {
         {renderError('terms')}
       </div>
 
-      <button type="submit" style={{ padding: '10px', marginTop: '16px', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>
+      <button
+        type="submit"
+        style={{
+          padding: '10px',
+          marginTop: '16px',
+          cursor: 'pointer',
+          fontSize: '1rem',
+          fontWeight: 'bold',
+        }}
+      >
         Submit (Uncontrolled)
       </button>
     </form>

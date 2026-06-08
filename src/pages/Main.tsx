@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Modal from '../components/ui/Modal';
 import { useFormStore } from '../store/useFormStore';
 import UncontrolledForm from '../components/UncontrolledForm';
+import HookForm from '../components/HookForm';
+import SubmissionCard from '../components/SubmissionCard';
 
 const Main = () => {
   const [isUncontrolledOpen, setIsUncontrolledOpen] = useState(false);
@@ -41,7 +43,7 @@ const Main = () => {
         onClose={() => setIsHookFormOpen(false)}
         title="React Hook Form"
       >
-        <div style={{ color: '#666' }}>[Место для React Hook Form]</div>
+        <HookForm onSuccess={() => setIsHookFormOpen(false)} />
       </Modal>
 
       <h2>Submissions History ({submissions.length})</h2>
@@ -51,37 +53,12 @@ const Main = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
             gap: '16px',
           }}
         >
           {submissions.map((data) => (
-            <div
-              key={data.id}
-              style={{
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                padding: '16px',
-                backgroundColor: '#f9f9f9',
-              }}
-            >
-              {data.image && (
-                <img
-                  src={data.image}
-                  alt={data.name}
-                  style={{
-                    width: '100%',
-                    height: '150px',
-                    objectFit: 'cover',
-                    borderRadius: '4px',
-                  }}
-                />
-              )}
-              <h3>{data.name}</h3>
-              <p>Age: {data.age}</p>
-              <p>Email: {data.email}</p>
-              <p>Country: {data.country}</p>
-            </div>
+            <SubmissionCard key={data.id} data={data} />
           ))}
         </div>
       )}
