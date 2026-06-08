@@ -3,12 +3,12 @@ export const validateImageFile = (file: File): string | null => {
   if (!validTypes.includes(file.type)) {
     return 'Only PNG and JPEG images are allowed';
   }
-  
+
   const maxSize = 2 * 1024 * 1024;
   if (file.size > maxSize) {
     return 'Image size must be less than 2MB';
   }
-  
+
   return null;
 };
 
