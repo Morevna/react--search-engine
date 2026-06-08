@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Modal from '../components/ui/Modal';
 import { useFormStore } from '../store/useFormStore';
+import UncontrolledForm from '../components/UncontrolledForm';
 
 const Main = () => {
   const [isUncontrolledOpen, setIsUncontrolledOpen] = useState(false);
@@ -32,7 +33,7 @@ const Main = () => {
         onClose={() => setIsUncontrolledOpen(false)}
         title="Uncontrolled Form"
       >
-        <div style={{ color: '#666' }}>[Место для Неуправляемой формы]</div>
+        <UncontrolledForm onSuccess={() => setIsUncontrolledOpen(false)} />
       </Modal>
 
       <Modal
