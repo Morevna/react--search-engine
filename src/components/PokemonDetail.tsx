@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { usePokemonDetails } from '../hooks/usePokemonQueries';
+import { useParams, useNavigate } from "react-router-dom";
+import { usePokemonDetails } from "../hooks/usePokemonQueries";
 
 const PokemonDetail = () => {
   const { id } = useParams();
@@ -11,18 +11,18 @@ const PokemonDetail = () => {
   if (!details) return null;
 
   return (
-    <div style={{ padding: '20px', position: 'relative' }}>
+    <div style={{ padding: "20px", position: "relative" }}>
       <button
-        onClick={() => navigate('/')}
-        style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer' }}
+        onClick={() => navigate("/")}
+        style={{ position: "absolute", right: 10, top: 10, cursor: "pointer" }}
       >
         ✖
       </button>
-      <h2 style={{ textTransform: 'capitalize' }}>{details.name}</h2>
+      <h2 style={{ textTransform: "capitalize" }}>{details.name}</h2>
       <img
         src={details.sprites.front_default}
         alt={details.name}
-        style={{ width: '150px' }}
+        style={{ width: "150px" }}
       />
       <p>
         <strong>Weight:</strong> {details.weight}

@@ -1,6 +1,6 @@
-import PokemonCard from './PokemonCard';
-import Loader from './Loader';
-import type { Pokemon } from '../App';
+import PokemonCard from "./PokemonCard";
+import Loader from "./Loader";
+import type { Pokemon } from "../App";
 
 interface Props {
   results: Pokemon[];
@@ -16,7 +16,7 @@ const Results = ({ results, isLoading, error }: Props) => {
     return (
       <p
         style={{
-          color: 'red',
+          color: "red",
         }}
       >
         {error}
@@ -27,9 +27,9 @@ const Results = ({ results, isLoading, error }: Props) => {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: '20px',
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+        gap: "20px",
       }}
     >
       {results.map((pokemon) => (

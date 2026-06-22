@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const TestErrorButton = ({}) => {
   const [hasError, setHasError] = useState(false);
@@ -8,22 +8,22 @@ const TestErrorButton = ({}) => {
   };
 
   if (hasError) {
-    throw new Error('Test Error');
+    throw new Error("Test Error");
   }
 
   return (
     <button
       onClick={handleClick}
       style={{
-        position: 'fixed',
-        left: '20px',
-        bottom: '10px',
-        padding: '12px 16px',
-        border: 'none',
-        borderRadius: '8px',
-        background: 'crimson',
-        color: 'white',
-        cursor: 'pointer',
+        position: "fixed",
+        left: "20px",
+        bottom: "10px",
+        padding: "12px 16px",
+        border: "none",
+        borderRadius: "8px",
+        background: "crimson",
+        color: "white",
+        cursor: "pointer",
         zIndex: 9999,
       }}
     >

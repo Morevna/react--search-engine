@@ -6,7 +6,7 @@ interface Props {
 
 const Search = ({ value, onChange, onSearch }: Props) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       onSearch();
     }
   };
@@ -14,8 +14,8 @@ const Search = ({ value, onChange, onSearch }: Props) => {
   return (
     <div
       style={{
-        display: 'flex',
-        gap: '10px',
+        display: "flex",
+        gap: "10px",
       }}
     >
       <input
@@ -26,7 +26,7 @@ const Search = ({ value, onChange, onSearch }: Props) => {
         onKeyDown={handleKeyDown}
         style={{
           flex: 1,
-          padding: '10px',
+          padding: "10px",
         }}
       />
 

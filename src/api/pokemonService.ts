@@ -1,4 +1,12 @@
-export const fetchPokemonList = async (term: string, page: number) => {
+export interface Pokemon {
+  name: string;
+  description: string;
+  image: string;
+}
+export const fetchPokemonList = async (
+  term: string,
+  page: number,
+): Promise<Pokemon[]> => {
   const trimmed = term.trim();
   const limit = 10;
   const offset = (page - 1) * limit;
@@ -8,7 +16,7 @@ export const fetchPokemonList = async (term: string, page: number) => {
     : `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
 
   const response = await fetch(url);
-  if (!response.ok) throw new Error('Pokemon not found');
+  if (!response.ok) throw new Error("Pokemon not found");
   const data = await response.json();
 
   if (!data.results) {
@@ -30,13 +38,13 @@ export const fetchPokemonList = async (term: string, page: number) => {
         description: `Base experience: ${pd.base_experience}`,
         image: pd.sprites.front_default,
       };
-    })
+    }),
   );
   return detailed;
 };
 
 export const fetchPokemonDetail = async (id: string) => {
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-  if (!res.ok) throw new Error('Details not found');
+  if (!res.ok) throw new Error("Details not found");
   return res.json();
 };

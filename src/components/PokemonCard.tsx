@@ -1,5 +1,5 @@
-import type { Pokemon } from '../App';
-import { usePokemonStore } from '../store/usePokemonStore';
+import { type Pokemon } from "../api/pokemonService";
+import { usePokemonStore } from "../store/usePokemonStore";
 
 interface Props {
   pokemon: Pokemon;
@@ -14,13 +14,13 @@ const PokemonCard = ({ pokemon, onClick }: Props) => {
     <div
       onClick={onClick}
       style={{
-        border: '1px solid #ddd',
-        borderRadius: '10px',
-        padding: '15px',
-        textAlign: 'center',
-        background: '#fafafa',
-        cursor: 'pointer',
-        position: 'relative',
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        padding: "15px",
+        textAlign: "center",
+        background: "#fafafa",
+        cursor: "pointer",
+        position: "relative",
       }}
     >
       <input
@@ -32,11 +32,11 @@ const PokemonCard = ({ pokemon, onClick }: Props) => {
         }}
         onClick={(e) => e.stopPropagation()}
         style={{
-          position: 'absolute',
-          top: '10px',
-          left: '10px',
+          position: "absolute",
+          top: "10px",
+          left: "10px",
           zIndex: 100,
-          cursor: 'pointer',
+          cursor: "pointer",
         }}
       />
 
