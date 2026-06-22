@@ -1,33 +1,17 @@
+"use client";
+
 import { usePokemonStore } from "../store/usePokemonStore";
-import { type Pokemon } from '../api/pokemonService';
+import { useRef } from "react";
 
 const Flyout = () => {
   const { selected, clear } = usePokemonStore();
-
-  const handleDownload = () => {
-    const headers = "Name,Description,URL\n";
-
-    const rows = selected
-      .map(
-        (p: Pokemon) =>
-          `${p.name},"${p.description}","https://pokeapi.co/api/v2/pokemon/${p.name.toLowerCase()}"`,
-      )
-      .join("\n");
-
-    const csvContent = headers + rows;
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${selected.length}_items.csv`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
+  const formRef = useRef<HTMLFormElement>(null);
 
   if (selected.length === 0) return null;
+
+  const handleDownload = () => {
+    formRef.current?.submit();
+  };
 
   return (
     <div
@@ -46,6 +30,15 @@ const Flyout = () => {
         boxShadow: "0 -2px 10px rgba(0,0,0,0.3)",
       }}
     >
+      <form
+        ref={formRef}
+        action="/api/download-csv"
+        method="POST"
+        style={{ display: "none" }}
+      >
+        <input type="hidden" name="pokemons" value={JSON.stringify(selected)} />
+      </form>
+
       <div>
         <strong>{selected.length}</strong> выбрано
       </div>

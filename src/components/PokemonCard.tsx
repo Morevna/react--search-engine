@@ -1,3 +1,5 @@
+"use client";
+
 import { type Pokemon } from "../api/pokemonService";
 import { usePokemonStore } from "../store/usePokemonStore";
 import Image from "next/image";

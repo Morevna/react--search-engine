@@ -1,6 +1,6 @@
 import PokemonCard from "@/components/PokemonCard";
 import PokemonDetail from "@/components/PokemonDetail";
-import Link from "next/link";
+import { Link } from "@/navigation"; 
 import { fetchPokemonList, type Pokemon } from "@/api/pokemonService";
 
 type Props = {
