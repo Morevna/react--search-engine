@@ -1,5 +1,6 @@
 import { type Pokemon } from "../api/pokemonService";
 import { usePokemonStore } from "../store/usePokemonStore";
+import Image from "next/image";
 
 interface Props {
   pokemon: Pokemon;
@@ -8,7 +9,7 @@ interface Props {
 
 const PokemonCard = ({ pokemon, onClick }: Props) => {
   const { selected, toggle } = usePokemonStore();
-  const isChecked = selected.some((p) => p.name === pokemon.name);
+  const isChecked = selected.some((p: Pokemon) => p.name === pokemon.name);
 
   return (
     <div
@@ -40,7 +41,13 @@ const PokemonCard = ({ pokemon, onClick }: Props) => {
         }}
       />
 
-      <img src={pokemon.image} alt={pokemon.name} width="120" />
+      <Image
+        src={pokemon.image}
+        alt={pokemon.name}
+        width={120}
+        height={120}
+        unoptimized
+      />
       <h3>{pokemon.name}</h3>
       <p>{pokemon.description}</p>
     </div>

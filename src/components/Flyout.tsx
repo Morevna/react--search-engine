@@ -1,5 +1,5 @@
 import { usePokemonStore } from "../store/usePokemonStore";
-import type { Pokemon } from "../App";
+import { type Pokemon } from '../api/pokemonService';
 
 const Flyout = () => {
   const { selected, clear } = usePokemonStore();

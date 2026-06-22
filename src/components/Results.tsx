@@ -1,6 +1,6 @@
 import PokemonCard from "./PokemonCard";
 import Loader from "./Loader";
-import type { Pokemon } from "../App";
+import { type Pokemon } from '../api/pokemonService';
 
 interface Props {
   results: Pokemon[];

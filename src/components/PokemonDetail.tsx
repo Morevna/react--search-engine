@@ -1,29 +1,43 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { usePokemonDetails } from "../hooks/usePokemonQueries";
+import Image from "next/image";
+import { fetchPokemonDetail } from "../api/pokemonService";
 
-const PokemonDetail = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+interface Props {
+  id?: string;
+}
 
-  const { data: details, isLoading } = usePokemonDetails(id);
+export default async function PokemonDetail({ id }: Props) {
+  if (!id) {
+    return (
+      <div style={{ padding: "20px", color: "gray" }}>
+        Выберите покемона из списка для просмотра деталей.
+      </div>
+    );
+  }
 
-  if (isLoading) return <div>Loading details...</div>;
-  if (!details) return null;
+  let details = null;
+
+  try {
+    details = await fetchPokemonDetail(id);
+  } catch {
+    return (
+      <div style={{ padding: "20px", color: "red" }}>
+        Ошибка загрузки деталей покемона.
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "20px", position: "relative" }}>
-      <button
-        onClick={() => navigate("/")}
-        style={{ position: "absolute", right: 10, top: 10, cursor: "pointer" }}
-      >
-        ✖
-      </button>
       <h2 style={{ textTransform: "capitalize" }}>{details.name}</h2>
-      <img
+
+      <Image
         src={details.sprites.front_default}
         alt={details.name}
-        style={{ width: "150px" }}
+        width={150}
+        height={150}
+        unoptimized
       />
+
       <p>
         <strong>Weight:</strong> {details.weight}
       </p>
@@ -32,6 +46,4 @@ const PokemonDetail = () => {
       </p>
     </div>
   );
-};
-
-export default PokemonDetail;
+}
