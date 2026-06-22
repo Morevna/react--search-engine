@@ -1,6 +1,6 @@
 "use client";
 
-import { type Pokemon } from "../api/pokemonService";
+import { type Pokemon } from "../app/api/pokemonService";
 import { usePokemonStore } from "../store/usePokemonStore";
 import Image from "next/image";
 
@@ -43,13 +43,7 @@ const PokemonCard = ({ pokemon, onClick }: Props) => {
         }}
       />
 
-      <Image
-        src={pokemon.image}
-        alt={pokemon.name}
-        width={120}
-        height={120}
-        unoptimized
-      />
+      <Image src={pokemon.image} alt={pokemon.name} width={120} height={120} />
       <h3>{pokemon.name}</h3>
       <p>{pokemon.description}</p>
     </div>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { fetchPokemonDetail } from "../api/pokemonService";
+import { fetchPokemonDetail } from "../app/api/pokemonService";
 
 interface Props {
   id?: string;
@@ -35,7 +35,6 @@ export default async function PokemonDetail({ id }: Props) {
         alt={details.name}
         width={150}
         height={150}
-        unoptimized
       />
 
       <p>

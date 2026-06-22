@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { type Pokemon } from '../api/pokemonService';
+import { create } from "zustand";
+import { type Pokemon } from "../app/api/pokemonService";
 
 interface PokemonState {
   selected: Pokemon[];

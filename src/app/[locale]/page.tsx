@@ -2,7 +2,7 @@ import PokemonCard from "@/components/PokemonCard";
 import PokemonDetail from "@/components/PokemonDetail";
 import { Link } from "@/navigation";
 import { redirect } from "next/navigation";
-import { fetchPokemonList, type Pokemon } from "@/api/pokemonService";
+import { fetchPokemonList, type Pokemon } from "@/app/api/pokemonService";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -16,7 +16,7 @@ type Props = {
 export default async function Home({ params, searchParams }: Props) {
   const { locale } = await params;
   const isRu = locale === "ru";
-  
+
   const p = await searchParams;
   const page = Number(p.page || 1);
   const query = p.query || "";
@@ -34,7 +34,10 @@ export default async function Home({ params, searchParams }: Props) {
     <main style={{ padding: "20px" }}>
       <h1>{isRu ? "Поиск Покемонов" : "Pokemon Search"}</h1>
 
-      <form action={handleSearch} style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+      <form
+        action={handleSearch}
+        style={{ display: "flex", gap: "10px", marginBottom: "20px" }}
+      >
         <input
           type="text"
           name="term"
@@ -42,7 +45,10 @@ export default async function Home({ params, searchParams }: Props) {
           placeholder={isRu ? "Искать покемона..." : "Search pokemon..."}
           style={{ flex: 1, padding: "10px", color: "black" }}
         />
-        <button type="submit" style={{ padding: "10px 20px", cursor: "pointer" }}>
+        <button
+          type="submit"
+          style={{ padding: "10px 20px", cursor: "pointer" }}
+        >
           {isRu ? "Найти" : "Search"}
         </button>
       </form>
